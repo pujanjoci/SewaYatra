@@ -1,0 +1,2 @@
+# This file tells GitHub Pages not to process the site with Jekyll
+# This is necessary for Vite/React apps to work correctly on GitHub Pages

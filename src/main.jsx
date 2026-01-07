@@ -6,7 +6,8 @@ import './index.css'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <BrowserRouter>
+    {/* basename is set for GitHub Pages deployment */}
+    <BrowserRouter basename="/SewaYatra">
       <App />
     </BrowserRouter>
   </React.StrictMode>,
