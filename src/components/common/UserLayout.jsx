@@ -2,6 +2,8 @@ import React from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import Navbar from './Navbar';
 import Footer from './Footer';
+import ScrollToTop from './ScrollToTop';
+import ScrollToTopOnRouteChange from './ScrollToTopOnRouteChange';
 
 const UserLayout = () => {
     const location = useLocation();
@@ -10,12 +12,14 @@ const UserLayout = () => {
     const hideFooter = location.pathname === '/login' || location.pathname === '/admin/login';
 
     return (
-        <div className="flex flex-col min-h-screen font-sans text-gray-900 bg-gray-50">
+        <div className="min-h-screen flex flex-col">
+            <ScrollToTopOnRouteChange />
             <Navbar />
             <main className="flex-grow">
                 <Outlet />
             </main>
             {!hideFooter && <Footer />}
+            <ScrollToTop />
         </div>
     );
 };

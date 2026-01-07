@@ -1,5 +1,5 @@
 // Login.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
@@ -23,6 +23,7 @@ const Login = () => {
     const [rememberMe, setRememberMe] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    const toastShownRef = useRef(false);
 
     // Check if user is already logged in
     useEffect(() => {
@@ -33,6 +34,9 @@ const Login = () => {
 
     // Check for login prompt on component mount - ONLY show toast if redirected
     useEffect(() => {
+        // Prevent duplicate toasts using ref
+        if (toastShownRef.current) return;
+
         // Check if this is a redirect-based navigation (not manual)
         const loginRequired = sessionStorage.getItem('loginRequired');
         const fromProtectedRoute = location.state?.fromProtectedRoute;
@@ -40,7 +44,8 @@ const Login = () => {
 
         // Only show toast if user was redirected (not manual navigation)
         if (loginRequired || fromProtectedRoute || hasPendingSearch) {
-            info('Please login to continue');
+            info('Please login to continue', 5000);
+            toastShownRef.current = true;
 
             // Clear the flag immediately to prevent showing toast again
             sessionStorage.removeItem('loginRequired');
@@ -190,17 +195,20 @@ const Login = () => {
     return (
         <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center p-6">
             <div className="max-w-md w-full">
-                <button
-                    onClick={() => navigate(-1)}
-                    className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-8 transition-colors"
-                >
-                    <ArrowLeft className="w-5 h-5" />
-                    Back
-                </button>
+                {/* Only show back button for signup form, not for login */}
+                {!isLoginMode && (
+                    <button
+                        onClick={() => navigate(-1)}
+                        className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-8 transition-colors"
+                    >
+                        <ArrowLeft className="w-5 h-5" />
+                        Back
+                    </button>
+                )}
 
                 <div className="bg-white rounded-2xl shadow-xl p-8">
                     <div className="text-center mb-8">
-                        <div className="inline-flex items-center justify-center w-12 h-12 bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl mb-4">
+                        <div className="inline-flex items-center justify-center w-12 h-12 bg-gradient-to-br from-emerald-500 to-green-600 rounded-xl mb-4">
                             <Bus className="w-6 h-6 text-white" />
                         </div>
                         <h1 className="text-2xl font-bold text-gray-900">
@@ -208,8 +216,8 @@ const Login = () => {
                         </h1>
                         <p className="text-gray-600 mt-2">
                             {isLoginMode
-                                ? 'Sign in to your SajiloSafar account'
-                                : 'Join SajiloSafar for your journey across Nepal'
+                                ? 'Sign in to your SewaYatra account'
+                                : 'Join SewaYatra for your journey across Nepal'
                             }
                         </p>
                     </div>
@@ -227,7 +235,7 @@ const Login = () => {
                                         name="name"
                                         value={formData.name}
                                         onChange={handleChange}
-                                        className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                                        className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors"
                                         placeholder="John Doe"
                                         required={!isLoginMode}
                                     />
@@ -265,7 +273,7 @@ const Login = () => {
                                         name="phone"
                                         value={formData.phone}
                                         onChange={handleChange}
-                                        className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                                        className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors"
                                         placeholder="98XXXXXXXX"
                                         required={!isLoginMode}
                                     />
@@ -337,11 +345,11 @@ const Login = () => {
                                         type="checkbox"
                                         checked={rememberMe}
                                         onChange={(e) => setRememberMe(e.target.checked)}
-                                        className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                                        className="w-4 h-4 text-emerald-600 rounded focus:ring-emerald-500"
                                     />
                                     <span className="ml-2 text-sm text-gray-700">Remember me</span>
                                 </label>
-                                <Link to="/forgot-password" className="text-sm text-blue-600 hover:text-blue-700">
+                                <Link to="/forgot-password" className="text-sm text-emerald-600 hover:text-emerald-700">
                                     Forgot password?
                                 </Link>
                             </div>
@@ -350,7 +358,7 @@ const Login = () => {
                         <button
                             type="submit"
                             disabled={isLoading}
-                            className="w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-medium rounded-lg hover:from-blue-700 hover:to-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-300 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="w-full py-3 px-4 bg-gradient-to-r from-emerald-500 to-green-600 text-white font-medium rounded-lg hover:from-emerald-600 hover:to-green-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 transition-all duration-300 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             {isLoading
                                 ? (isLoginMode ? 'Signing in...' : 'Creating account...')
@@ -367,21 +375,12 @@ const Login = () => {
                             }
                             <button
                                 onClick={toggleMode}
-                                className="text-blue-600 hover:text-blue-700 font-medium focus:outline-none"
+                                className="text-emerald-600 hover:text-emerald-700 font-medium focus:outline-none"
                             >
                                 {isLoginMode ? 'Sign up' : 'Sign in'}
                             </button>
                         </p>
                     </div>
-
-                    {!isLoginMode && (
-                        <div className="mt-4 p-4 bg-blue-50 rounded-lg">
-                            <p className="text-sm text-blue-800 text-center">
-                                <strong>Note for Development:</strong> User data is stored in localStorage.
-                                For production, this should be replaced with a secure backend API.
-                            </p>
-                        </div>
-                    )}
                 </div>
             </div>
         </div>

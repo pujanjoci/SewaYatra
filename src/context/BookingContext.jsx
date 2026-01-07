@@ -1,7 +1,14 @@
-import React, { createContext, useState, useContext, useCallback } from 'react';
+import React, { createContext, useState, useContext, useCallback, useEffect } from 'react';
 import { buses as initialBuses } from '../data/buses';
-import { bookings as initialBookings } from '../data/bookings';
 import { routes } from '../data/routes';
+import { useAuth } from './AuthContext';
+import {
+    saveUserBooking,
+    getUserBookings,
+    getAllBookings,
+    deleteUserBooking,
+    getBookedSeatsForBus
+} from '../utils/bookingStorage';
 
 const BookingContext = createContext();
 
@@ -14,13 +21,30 @@ export const useBooking = () => {
 };
 
 export const BookingProvider = ({ children }) => {
+    const { user } = useAuth();
     const [buses, setBuses] = useState(initialBuses);
-    const [bookings, setBookings] = useState(initialBookings);
+    const [bookings, setBookings] = useState([]);
     const [searchParams, setSearchParams] = useState({
         from: '',
         to: '',
         date: ''
     });
+
+    // Load bookings based on user role
+    useEffect(() => {
+        if (user) {
+            if (user.isAdmin) {
+                // Admin sees all bookings
+                setBookings(getAllBookings());
+            } else {
+                // Regular user sees only their bookings
+                setBookings(getUserBookings(user.email));
+            }
+        } else {
+            // No user logged in, no bookings
+            setBookings([]);
+        }
+    }, [user]);
 
     const searchBuses = useCallback((from, to, date) => {
         setSearchParams({ from, to, date });
@@ -60,36 +84,35 @@ export const BookingProvider = ({ children }) => {
     }, [buses]);
 
     const getBookedSeats = useCallback((busId, date = null) => {
-        const filteredBookings = bookings.filter(
-            booking => booking.busId === parseInt(busId)
-        );
-
-        if (date) {
-            // Filter by date if provided
-            return filteredBookings
-                .filter(booking => booking.date === date)
-                .flatMap(booking => booking.seatNumbers);
-        }
-
-        // For demo, return seats from all bookings for this bus
-        return filteredBookings.flatMap(booking => booking.seatNumbers);
-    }, [bookings]);
+        // Read directly from localStorage to get real-time data
+        return getBookedSeatsForBus(busId, date);
+    }, []);
 
     const addBooking = useCallback((bookingDetails) => {
-        const newBooking = {
-            id: `BK-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-            createdAt: new Date().toISOString(),
-            status: 'Confirmed',
-            ...bookingDetails
-        };
+        if (!user || !user.email) {
+            throw new Error('User must be logged in to create a booking');
+        }
 
+        // Save to localStorage with user email
+        const newBooking = saveUserBooking(user.email, bookingDetails);
+
+        // Update local state
         setBookings(prev => [newBooking, ...prev]);
+
         return newBooking;
-    }, []);
+    }, [user]);
 
     const deleteBooking = useCallback((id) => {
+        if (!user || !user.email) {
+            return;
+        }
+
+        // Delete from localStorage
+        deleteUserBooking(user.email, id);
+
+        // Update local state
         setBookings(prev => prev.filter(booking => booking.id !== id));
-    }, []);
+    }, [user]);
 
     const addBus = useCallback((newBus) => {
         setBuses(prev => [...prev, {
@@ -109,6 +132,11 @@ export const BookingProvider = ({ children }) => {
         setBuses(prev => prev.filter(bus => bus.id !== id));
     }, []);
 
+    // Method for admin to get all bookings
+    const getAllBookingsForAdmin = useCallback(() => {
+        return getAllBookings();
+    }, []);
+
     const value = {
         buses,
         routes,
@@ -121,7 +149,8 @@ export const BookingProvider = ({ children }) => {
         deleteBooking,
         addBus,
         updateBus,
-        deleteBus
+        deleteBus,
+        getAllBookingsForAdmin
     };
 
     return (

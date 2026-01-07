@@ -1,6 +1,7 @@
 /* eslint-disable react-refresh/only-export-components */
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { adminUsers } from '../data/adminUsers';
+import { createSession, getSession, isSessionValid, clearSession } from '../utils/sessionManager';
 
 const AuthContext = createContext();
 
@@ -8,15 +9,36 @@ export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(() => {
-        const storedUser = localStorage.getItem('user');
-        return storedUser ? JSON.parse(storedUser) : null;
+        // Check session first, then fallback to localStorage
+        const session = getSession();
+        if (session && isSessionValid()) {
+            return {
+                id: session.userId,
+                name: session.username,
+                email: session.email,
+                role: session.role,
+                isAdmin: session.isAdmin
+            };
+        }
+        return null;
     });
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const storedUser = localStorage.getItem('user');
-        if (storedUser) {
-            setUser(JSON.parse(storedUser));
+        // Validate session on mount
+        const session = getSession();
+        if (session && isSessionValid()) {
+            setUser({
+                id: session.userId,
+                name: session.username,
+                email: session.email,
+                role: session.role,
+                isAdmin: session.isAdmin
+            });
+        } else {
+            // Clear invalid session
+            clearSession();
+            setUser(null);
         }
         setLoading(false);
     }, []);
@@ -38,6 +60,10 @@ export const AuthProvider = ({ children }) => {
         if (admin) {
             const { password: _, ...userWithoutPassword } = admin;
             const userData = { ...userWithoutPassword, role: 'admin', isAdmin: true };
+
+            // Create session in sessionStorage
+            createSession(userData);
+
             setUser(userData);
             localStorage.setItem('user', JSON.stringify(userData));
             return { success: true, user: userData };
@@ -57,10 +83,13 @@ export const AuthProvider = ({ children }) => {
                     email: user.email,
                     name: user.name,
                     phone: user.phone,
-                    role: 'user',
+                    role: 'staff', // Changed from 'user' to 'staff'
                     isAdmin: false,
                     token: `local_${Date.now()}` // Generate a local token
                 };
+
+                // Create session in sessionStorage
+                createSession(userData);
 
                 setUser(userData);
                 localStorage.setItem('user', JSON.stringify(userData));
@@ -104,13 +133,15 @@ export const AuthProvider = ({ children }) => {
                 return { success: false, message: 'Email already registered' };
             }
 
-            // Create new user
+            // Create new user with 'staff' role
             const newUser = {
                 id: 'user_' + Date.now(),
                 email: userData.email,
                 name: userData.name,
                 phone: userData.phone,
                 password: userData.password, // Note: In production, never store plain passwords
+                role: 'staff', // New users are created with 'staff' role
+                status: 'Active',
                 createdAt: new Date().toISOString()
             };
 
@@ -175,9 +206,10 @@ export const AuthProvider = ({ children }) => {
 
     const logout = () => {
         setUser(null);
-        localStorage.removeItem('user');
-        localStorage.removeItem('authToken');
+        // Clear session from sessionStorage (DO NOT touch localStorage)
+        clearSession();
         sessionStorage.removeItem('pendingSearch');
+        // Note: localStorage data is preserved for user data persistence
     };
 
     const isAdmin = () => {
@@ -185,7 +217,8 @@ export const AuthProvider = ({ children }) => {
     };
 
     const isAuthenticated = () => {
-        return !!user;
+        // Check both user state and session validity
+        return !!user && isSessionValid();
     };
 
     // Helper function to require login and store pending action

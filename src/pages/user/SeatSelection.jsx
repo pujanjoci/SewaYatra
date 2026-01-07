@@ -47,7 +47,7 @@ const SeatSelection = () => {
     };
 
     const handleProceed = () => {
-        navigate('/booking-summary', {
+        navigate('/checkout', {
             state: {
                 bus,
                 selectedSeats,
@@ -310,9 +310,9 @@ const SeatSelection = () => {
                                             <div key={seatNum} className="flex items-center justify-between bg-gray-50 p-3 rounded-lg hover:bg-gray-100 transition">
                                                 <div className="flex items-center gap-2">
                                                     <div className={`w-3 h-3 rounded ${seatType === 'premium' ? 'bg-amber-500' :
-                                                            seatType === 'sofa' ? 'bg-emerald-500' :
-                                                                seatType.includes('window') ? 'bg-blue-400' :
-                                                                    'bg-gray-400'
+                                                        seatType === 'sofa' ? 'bg-emerald-500' :
+                                                            seatType.includes('window') ? 'bg-blue-400' :
+                                                                'bg-gray-400'
                                                         }`} />
                                                     <span className="font-medium text-gray-700">Seat #{seatNum}</span>
                                                     <span className="text-xs px-2 py-1 rounded bg-gray-200 text-gray-600">

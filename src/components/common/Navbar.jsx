@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Bus, User, LogIn, Menu, X, LogOut } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import SewaYatra from '../../assets/sewayatra.svg';
 
 const Navbar = () => {
     const navigate = useNavigate();
@@ -86,7 +87,6 @@ const Navbar = () => {
         { to: "/about", label: "About" },
         { to: "/routes", label: "Routes" },
         { to: "/contact", label: "Contact" },
-        { to: "/my-tickets", label: "My Tickets" },
     ];
 
     return (
@@ -103,10 +103,8 @@ const Navbar = () => {
                             to="/"
                             className="flex items-center gap-2 text-xl font-bold text-gray-900 group"
                         >
-                            <div className="bg-gradient-to-br from-blue-700 to-blue-800 text-white p-1.5 rounded-lg group-hover:from-blue-800 group-hover:to-blue-900 transition-all duration-300 transform group-hover:scale-105">
-                                <Bus className="w-5 h-5" />
-                            </div>
-                            <span className="tracking-tight">Sajilo<span className="text-blue-700">Safar</span></span>
+                            <img src={SewaYatra} alt="Sewa Yatra" className="w-12 h-12" />
+                            <span className="tracking-tight">Sewa<span className="text-emerald-600">Yatra</span></span>
                         </Link>
 
                         {/* Desktop Navigation */}
@@ -115,10 +113,10 @@ const Navbar = () => {
                                 <Link
                                     key={item.label}
                                     to={item.to}
-                                    className="text-sm font-medium text-gray-700 hover:text-blue-700 transition-colors duration-200 relative group"
+                                    className="text-sm font-medium text-gray-700 hover:text-emerald-600 transition-colors duration-200 relative group"
                                 >
                                     {item.label}
-                                    <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-blue-600 to-blue-700 transition-all duration-300 group-hover:w-full"></span>
+                                    <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-emerald-500 to-green-600 transition-all duration-300 group-hover:w-full"></span>
                                 </Link>
                             ))}
                         </div>
@@ -129,7 +127,7 @@ const Navbar = () => {
                                 <div className="relative">
                                     <button
                                         onClick={() => setShowUserMenu(!showUserMenu)}
-                                        className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-blue-700 to-blue-800 text-white hover:from-blue-800 hover:to-blue-900 transition-all duration-300 shadow-md hover:shadow-lg text-sm font-medium"
+                                        className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-emerald-500 to-green-600 text-white hover:from-emerald-600 hover:to-green-700 transition-all duration-300 shadow-md hover:shadow-lg text-sm font-medium"
                                     >
                                         <User className="w-4 h-4" />
                                         <span className="hidden sm:inline">{user?.name || user?.email || 'Account'}</span>
@@ -162,7 +160,7 @@ const Navbar = () => {
                             ) : (
                                 <button
                                     onClick={handleSignInClick}
-                                    className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-blue-700 to-blue-800 text-white hover:from-blue-800 hover:to-blue-900 transition-all duration-300 transform hover:scale-105 shadow-md hover:shadow-lg text-sm font-medium group"
+                                    className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-emerald-500 to-green-600 text-white hover:from-emerald-600 hover:to-green-700 transition-all duration-300 transform hover:scale-105 shadow-md hover:shadow-lg text-sm font-medium group"
                                 >
                                     <LogIn className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
                                     <span className="hidden sm:inline">Sign In</span>
@@ -196,7 +194,7 @@ const Navbar = () => {
                                         key={item.label}
                                         to={item.to}
                                         onClick={() => setIsMobileMenuOpen(false)}
-                                        className="text-base font-medium text-gray-700 hover:text-blue-700 py-3 px-4 rounded-lg hover:bg-gray-50 transition-all duration-200"
+                                        className="text-base font-medium text-gray-700 hover:text-emerald-600 py-3 px-4 rounded-lg hover:bg-gray-50 transition-all duration-200"
                                     >
                                         {item.label}
                                     </Link>
@@ -207,7 +205,7 @@ const Navbar = () => {
                                             handleSignInClick();
                                             setIsMobileMenuOpen(false);
                                         }}
-                                        className="flex items-center justify-center gap-2 w-full px-4 py-3 rounded-lg bg-gradient-to-r from-blue-700 to-blue-800 text-white hover:from-blue-800 hover:to-blue-900 transition-all duration-300 text-base font-medium"
+                                        className="flex items-center justify-center gap-2 w-full px-4 py-3 rounded-lg bg-gradient-to-r from-emerald-500 to-green-600 text-white hover:from-emerald-600 hover:to-green-700 transition-all duration-300 text-base font-medium"
                                     >
                                         <User className="w-5 h-5" />
                                         Sign In to Account

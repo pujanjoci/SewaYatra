@@ -2,16 +2,19 @@ import React from 'react';
 import { useBooking } from '../../context/BookingContext';
 import AdminTable from '../../components/admin/ui/AdminTable';
 import StatusBadge from '../../components/admin/ui/StatusBadge';
-import { Eye, Edit2 } from 'lucide-react';
+import { Eye } from 'lucide-react';
 
 const ManageBookings = () => {
-    const { bookings, deleteBooking } = useBooking();
+    const { getAllBookingsForAdmin } = useBooking();
+
+    // Get all bookings from localStorage
+    const bookings = getAllBookingsForAdmin();
 
     const columns = [
         {
             header: 'Booking ID',
             accessor: 'id',
-            render: (booking) => <span className="font-mono text-xs text-gray-500">#{booking.id?.slice(0, 8)}</span>
+            render: (booking) => <span className="font-mono text-xs text-gray-500">#{booking.bookingId?.slice(0, 8) || booking.id?.slice(0, 8)}</span>
         },
         {
             header: 'Customer',
@@ -19,7 +22,7 @@ const ManageBookings = () => {
             render: (booking) => (
                 <div>
                     <div className="font-medium text-gray-900">{booking.passengerName}</div>
-                    <div className="text-xs text-gray-500">{booking.phoneNumber}</div>
+                    <div className="text-xs text-gray-500">{booking.email}</div>
                 </div>
             )
         },
@@ -29,15 +32,15 @@ const ManageBookings = () => {
             render: (booking) => (
                 <div>
                     <div className="text-gray-900">{booking.busName}</div>
-                    <div className="text-xs text-gray-500">{booking.selectedSeats?.length} Seats • {booking.selectedSeats?.join(', ')}</div>
+                    <div className="text-xs text-gray-500">{booking.seatNumbers?.length} Seats • {booking.seatNumbers?.join(', ')}</div>
                 </div>
             )
         },
         { header: 'Travel Date', accessor: 'date' },
         {
             header: 'Amount',
-            accessor: 'totalPrice',
-            render: (booking) => <span className="font-semibold text-gray-900">NPR {booking.totalPrice}</span>
+            accessor: 'totalAmount',
+            render: (booking) => <span className="font-semibold text-gray-900">NPR {booking.totalAmount?.toLocaleString()}</span>
         },
         {
             header: 'Status',

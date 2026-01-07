@@ -1,18 +1,20 @@
 import React from 'react';
 import { useBooking } from '../../context/BookingContext';
-import { Bus, Map as MapIcon, Ticket, Wallet } from 'lucide-react';
+import { calculateTotalRevenue, getRecentBookings } from '../../utils/bookingStorage';
+import { Bus, Map as MapIcon, Ticket, Wallet, Calendar, User } from 'lucide-react';
 
 const AdminDashboard = () => {
-    const { buses, routes, bookings } = useBooking();
+    const { buses, routes, getAllBookingsForAdmin } = useBooking();
 
-    // Calculate Stats
-    const totalRevenue = bookings.reduce((sum, booking) => {
-        const priceStr = booking.totalPrice ? String(booking.totalPrice) : '0';
-        return sum + parseInt(priceStr.replace(/,/g, '') || 0);
-    }, 0);
+    // Get all bookings from localStorage
+    const allBookings = getAllBookingsForAdmin();
+    const recentBookings = getRecentBookings(5);
+
+    // Calculate Stats from localStorage
+    const totalRevenue = calculateTotalRevenue();
     const totalBuses = buses.length;
     const activeRoutes = routes.length;
-    const totalBookings = bookings.length;
+    const totalBookings = allBookings.length;
 
     const stats = [
         {
@@ -20,7 +22,7 @@ const AdminDashboard = () => {
             value: `NPR ${totalRevenue.toLocaleString()}`,
             icon: Wallet,
             color: 'bg-emerald-500',
-            trend: '+12.5%',
+            trend: `${totalBookings} bookings`,
             trendUp: true
         },
         {
@@ -28,7 +30,7 @@ const AdminDashboard = () => {
             value: totalBookings,
             icon: Ticket,
             color: 'bg-blue-500',
-            trend: '+8.2%',
+            trend: `${recentBookings.length} recent`,
             trendUp: true
         },
         {
@@ -36,7 +38,7 @@ const AdminDashboard = () => {
             value: activeRoutes,
             icon: MapIcon,
             color: 'bg-purple-500',
-            trend: '+2.4%',
+            trend: 'Available',
             trendUp: true
         },
         {
@@ -44,7 +46,7 @@ const AdminDashboard = () => {
             value: totalBuses,
             icon: Bus,
             color: 'bg-orange-500',
-            trend: 'Stable',
+            trend: 'Active',
             trendUp: true
         }
     ];
@@ -67,7 +69,6 @@ const AdminDashboard = () => {
                                 <span className="text-emerald-600 font-medium bg-emerald-50 px-2 py-0.5 rounded-full">
                                     {stat.trend}
                                 </span>
-                                <span className="text-gray-400 ml-2">from last month</span>
                             </div>
                         </div>
                         <div className={`p-3 rounded-xl ${stat.color} bg-opacity-10`}>
@@ -77,15 +78,76 @@ const AdminDashboard = () => {
                 ))}
             </div>
 
-            {/* Recent Bookings Placeholder (Can be expanded later) */}
+            {/* Recent Bookings */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
                 <div className="p-6 border-b border-gray-100 flex justify-between items-center">
                     <h2 className="text-lg font-bold text-gray-900">Recent Bookings</h2>
-                    <button className="text-sm text-blue-600 hover:text-blue-700 font-medium">View All</button>
+                    <button
+                        onClick={() => window.location.href = '/admin/bookings'}
+                        className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+                    >
+                        View All
+                    </button>
                 </div>
-                <div className="p-6 text-center text-gray-500 py-12">
-                    <p>Booking table will be refactored in the next step.</p>
-                </div>
+
+                {recentBookings.length === 0 ? (
+                    <div className="p-6 text-center text-gray-500 py-12">
+                        <p>No bookings yet.</p>
+                    </div>
+                ) : (
+                    <div className="overflow-x-auto">
+                        <table className="w-full">
+                            <thead className="bg-gray-50 border-b border-gray-100">
+                                <tr>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Booking ID</th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer</th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Bus</th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody className="bg-white divide-y divide-gray-100">
+                                {recentBookings.map((booking) => (
+                                    <tr key={booking.id} className="hover:bg-gray-50">
+                                        <td className="px-6 py-4 whitespace-nowrap">
+                                            <span className="text-sm font-mono text-gray-500">#{booking.bookingId || booking.id.slice(0, 10)}</span>
+                                        </td>
+                                        <td className="px-6 py-4 whitespace-nowrap">
+                                            <div className="flex items-center">
+                                                <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-3">
+                                                    <User className="w-4 h-4 text-blue-600" />
+                                                </div>
+                                                <div>
+                                                    <div className="text-sm font-medium text-gray-900">{booking.passengerName}</div>
+                                                    <div className="text-xs text-gray-500">{booking.email}</div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td className="px-6 py-4 whitespace-nowrap">
+                                            <div className="text-sm text-gray-900">{booking.busName}</div>
+                                            <div className="text-xs text-gray-500">{booking.seatNumbers?.length} seat(s)</div>
+                                        </td>
+                                        <td className="px-6 py-4 whitespace-nowrap">
+                                            <div className="flex items-center text-sm text-gray-500">
+                                                <Calendar className="w-4 h-4 mr-1" />
+                                                {booking.date}
+                                            </div>
+                                        </td>
+                                        <td className="px-6 py-4 whitespace-nowrap">
+                                            <span className="text-sm font-semibold text-gray-900">NPR {booking.totalAmount?.toLocaleString()}</span>
+                                        </td>
+                                        <td className="px-6 py-4 whitespace-nowrap">
+                                            <span className="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                                {booking.status || 'Confirmed'}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                )}
             </div>
         </div>
     );

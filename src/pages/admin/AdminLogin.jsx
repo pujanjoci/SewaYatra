@@ -52,7 +52,7 @@ const AdminLogin = () => {
         <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
             <div className="bg-white rounded-xl shadow-lg p-8 max-w-md w-full">
                 <div className="text-center mb-8">
-                    <h2 className="text-3xl font-bold text-gray-800">Admin Login</h2>
+                    <h2 className="text-3xl font-bold text-gray-800">Sewa Admin</h2>
                     <p className="text-gray-500 mt-2">Sign in to manage the system</p>
                 </div>
 

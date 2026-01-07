@@ -13,9 +13,13 @@ import RoutesPage from '../pages/user/Routes';
 import Contact from '../pages/user/Contact';
 import BusList from '../pages/user/BusList';
 import SeatSelection from '../pages/user/SeatSelection';
-import BookingSummary from '../pages/user/BookingSummary';
+import Checkout from '../pages/user/Checkout';
 import MyTickets from '../pages/user/MyTickets';
 import Login from '../pages/user/Login';
+import PrivacyPolicyPage from '../pages/user/PrivacyPolicyPage';
+import TermsOfServicePage from '../pages/user/TermsOfServicePage';
+import RefundPolicyPage from '../pages/user/RefundPolicyPage';
+import CookiePolicyPage from '../pages/user/CookiePolicyPage';
 
 // Admin Pages
 import AdminLogin from '../pages/admin/AdminLogin';
@@ -36,9 +40,15 @@ const AppRoutes = () => {
                 <Route path="/contact" element={<Contact />} />
                 <Route path="/buses" element={<BusList />} />
                 <Route path="/book/:id" element={<SeatSelection />} />
-                <Route path="/booking-summary" element={<BookingSummary />} />
+                <Route path="/checkout" element={<Checkout />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/my-tickets" element={<MyTickets />} />
+
+                {/* Policy Pages */}
+                <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
+                <Route path="/terms-of-service" element={<TermsOfServicePage />} />
+                <Route path="/refund-policy" element={<RefundPolicyPage />} />
+                <Route path="/cookie-policy" element={<CookiePolicyPage />} />
             </Route>
 
             {/* Admin Authentication */}

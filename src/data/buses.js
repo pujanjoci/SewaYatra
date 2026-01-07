@@ -9,7 +9,7 @@ export const buses = [
         seatsAvailable: 25,
         amenities: ["wifi", "ac", "toilet", "charging"],
         rating: 4.5,
-        company: "Sajilo Safar",
+        company: "SewaYatra",
         busNumber: "BA 1 PA 1234",
         rules: {},
         serviceAreas: ["all"],
@@ -219,7 +219,7 @@ export const buses = [
         seatsAvailable: 25,
         amenities: ["wifi", "ac", "charging"],
         rating: 4.5,
-        company: "Sajilo Safar",
+        company: "SewaYatra",
         busNumber: "BA 5 KHA 5566",
         rules: {
             allowedDestinations: ['Kathmandu']

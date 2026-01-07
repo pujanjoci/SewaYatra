@@ -1,36 +1,40 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useBooking } from '../../context/BookingContext';
+import { useAuth } from '../../context/AuthContext';
+import { useToast } from '../../context/ToastContext';
 import {
     CheckCircle,
     CreditCard,
-    Smartphone,
     Wallet,
     Shield,
     Lock,
     ArrowLeft,
-    User,
     Calendar,
     Clock,
     MapPin
 } from 'lucide-react';
 
-const BookingSummary = () => {
+const Checkout = () => {
     const location = useLocation();
     const navigate = useNavigate();
     const { addBooking } = useBooking();
+    const { user, isAuthenticated } = useAuth();
+    const { showToast } = useToast();
     const { bus, selectedSeats, seatPrices = [], date = new Date().toISOString().split('T')[0] } = location.state || {};
 
-    const [passengerDetails, setPassengerDetails] = useState({
-        name: '',
-        email: '',
-        phone: '',
-        emergencyContact: ''
-    });
     const [paymentMethod, setPaymentMethod] = useState('esewa');
     const [isProcessing, setIsProcessing] = useState(false);
     const [bookingComplete, setBookingComplete] = useState(false);
     const [bookingId, setBookingId] = useState('');
+
+    // Check authentication and redirect if not logged in
+    useEffect(() => {
+        if (!isAuthenticated) {
+            showToast('Please login to complete your booking', 'error');
+            navigate('/login', { state: { from: '/checkout', bookingData: { bus, selectedSeats, seatPrices, date } } });
+        }
+    }, [isAuthenticated, navigate, showToast, bus, selectedSeats, seatPrices, date]);
 
     useEffect(() => {
         if (!bus || !selectedSeats) {
@@ -87,58 +91,49 @@ const BookingSummary = () => {
         day: 'numeric'
     });
 
-    const handleInputChange = (e) => {
-        const { name, value } = e.target;
-        setPassengerDetails(prev => ({
-            ...prev,
-            [name]: value
-        }));
-    };
-
     const handlePayment = async (e) => {
         e.preventDefault();
 
-        // Validate inputs
-        if (!passengerDetails.name || !passengerDetails.email || !passengerDetails.phone) {
-            alert("Please fill in all required passenger details");
-            return;
-        }
-
-        if (passengerDetails.phone.length !== 10) {
-            alert("Please enter a valid 10-digit phone number");
+        if (!user) {
+            showToast('Please login to complete booking', 'error');
             return;
         }
 
         setIsProcessing(true);
 
-        // Simulate payment processing
-        await new Promise(resolve => setTimeout(resolve, 2000));
+        try {
+            // Simulate payment processing
+            await new Promise(resolve => setTimeout(resolve, 2000));
 
-        // Generate booking ID
-        const newBookingId = `BK${Date.now().toString().slice(-8)}`;
-        setBookingId(newBookingId);
+            // Generate booking ID
+            const newBookingId = `BK${Date.now().toString().slice(-8)}`;
+            setBookingId(newBookingId);
 
-        // Add booking to context
-        addBooking({
-            busId: bus.id,
-            userId: Math.floor(Math.random() * 1000) + 1,
-            seatNumbers: selectedSeats,
-            seatDetails: seatPrices,
-            totalAmount: prices.grandTotal,
-            date: date,
-            passengerName: passengerDetails.name,
-            contactNumber: passengerDetails.phone,
-            email: passengerDetails.email,
-            emergencyContact: passengerDetails.emergencyContact,
-            bookingId: newBookingId,
-            paymentMethod: paymentMethod,
-            busName: bus.name,
-            busNumber: bus.busNumber,
-            departureTime: bus.departureTime || '07:00 AM'
-        });
+            // Add booking to context (uses logged-in user's email)
+            addBooking({
+                busId: bus.id,
+                seatNumbers: selectedSeats,
+                seatDetails: seatPrices,
+                totalAmount: prices.grandTotal,
+                date: date,
+                passengerName: user.name,
+                contactNumber: user.phone,
+                email: user.email,
+                bookingId: newBookingId,
+                paymentMethod: paymentMethod,
+                busName: bus.name,
+                busNumber: bus.busNumber,
+                departureTime: bus.departureTime || '07:00 AM'
+            });
 
-        setIsProcessing(false);
-        setBookingComplete(true);
+            setIsProcessing(false);
+            setBookingComplete(true);
+            showToast('Booking confirmed successfully!', 'success');
+        } catch (error) {
+            setIsProcessing(false);
+            showToast('Booking failed. Please try again.', 'error');
+            console.error('Booking error:', error);
+        }
     };
 
     const handleBack = () => {
@@ -196,11 +191,11 @@ const BookingSummary = () => {
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                             <div className="bg-gray-50 p-4 rounded-lg">
                                                 <p className="text-sm text-gray-500 mb-1">Passenger</p>
-                                                <p className="font-semibold text-gray-900">{passengerDetails.name}</p>
+                                                <p className="font-semibold text-gray-900">{user?.name}</p>
                                             </div>
                                             <div className="bg-gray-50 p-4 rounded-lg">
                                                 <p className="text-sm text-gray-500 mb-1">Contact</p>
-                                                <p className="font-semibold text-gray-900">{passengerDetails.phone}</p>
+                                                <p className="font-semibold text-gray-900">{user?.phone}</p>
                                             </div>
                                         </div>
 
@@ -211,7 +206,7 @@ const BookingSummary = () => {
                                                     <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
                                                         <span className="text-sm font-semibold text-blue-600">1</span>
                                                     </div>
-                                                    <p className="text-gray-700">Your e-ticket has been sent to <span className="font-semibold">{passengerDetails.email}</span></p>
+                                                    <p className="text-gray-700">Your e-ticket has been sent to <span className="font-semibold">{user?.email}</span></p>
                                                 </div>
                                                 <div className="flex items-start gap-3">
                                                     <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
@@ -241,76 +236,29 @@ const BookingSummary = () => {
                             </div>
                         ) : (
                             <>
-                                {/* Passenger Details */}
+                                {/* Logged-in User Info Display */}
                                 <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100 mb-6">
                                     <div className="flex items-center gap-3 mb-6">
-                                        <User className="w-6 h-6 text-blue-500" />
-                                        <h2 className="text-xl font-bold text-gray-900">Passenger Information</h2>
+                                        <Shield className="w-6 h-6 text-green-500" />
+                                        <h2 className="text-xl font-bold text-gray-900">Booking For</h2>
                                     </div>
 
-                                    <form onSubmit={handlePayment}>
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div className="bg-gradient-to-r from-blue-50 to-blue-50/50 p-5 rounded-xl">
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                             <div>
-                                                <label className="block text-sm font-medium text-gray-700 mb-2">
-                                                    Full Name <span className="text-red-500">*</span>
-                                                </label>
-                                                <input
-                                                    type="text"
-                                                    name="name"
-                                                    required
-                                                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
-                                                    value={passengerDetails.name}
-                                                    onChange={handleInputChange}
-                                                    placeholder="John Doe"
-                                                />
+                                                <p className="text-sm text-gray-500 mb-1">Passenger Name</p>
+                                                <p className="font-semibold text-gray-900">{user?.name}</p>
                                             </div>
-
                                             <div>
-                                                <label className="block text-sm font-medium text-gray-700 mb-2">
-                                                    Email Address <span className="text-red-500">*</span>
-                                                </label>
-                                                <input
-                                                    type="email"
-                                                    name="email"
-                                                    required
-                                                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
-                                                    value={passengerDetails.email}
-                                                    onChange={handleInputChange}
-                                                    placeholder="john@example.com"
-                                                />
+                                                <p className="text-sm text-gray-500 mb-1">Email Address</p>
+                                                <p className="font-semibold text-gray-900">{user?.email}</p>
                                             </div>
-
                                             <div>
-                                                <label className="block text-sm font-medium text-gray-700 mb-2">
-                                                    Phone Number <span className="text-red-500">*</span>
-                                                </label>
-                                                <input
-                                                    type="tel"
-                                                    name="phone"
-                                                    required
-                                                    pattern="[0-9]{10}"
-                                                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
-                                                    value={passengerDetails.phone}
-                                                    onChange={handleInputChange}
-                                                    placeholder="98XXXXXXXX"
-                                                />
-                                            </div>
-
-                                            <div>
-                                                <label className="block text-sm font-medium text-gray-700 mb-2">
-                                                    Emergency Contact
-                                                </label>
-                                                <input
-                                                    type="tel"
-                                                    name="emergencyContact"
-                                                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
-                                                    value={passengerDetails.emergencyContact}
-                                                    onChange={handleInputChange}
-                                                    placeholder="Optional"
-                                                />
+                                                <p className="text-sm text-gray-500 mb-1">Phone Number</p>
+                                                <p className="font-semibold text-gray-900">{user?.phone}</p>
                                             </div>
                                         </div>
-                                    </form>
+                                    </div>
                                 </div>
 
                                 {/* Payment Methods */}
@@ -535,4 +483,4 @@ const PaymentOption = ({ id, icon, title, description, isSelected, onSelect }) =
     );
 };
 
-export default BookingSummary;
+export default Checkout;

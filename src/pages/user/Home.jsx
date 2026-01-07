@@ -78,29 +78,12 @@ const Home = () => {
             {/* Hero Section */}
             <Hero />
 
-            {/* Stats Section */}
-            <section className="py-12 bg-gradient-to-r from-blue-50 to-indigo-50">
-                <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
-                        {stats.map((stat, index) => (
-                            <div key={index} className="text-center">
-                                <div className="inline-flex items-center justify-center w-12 h-12 md:w-14 md:h-14 rounded-full bg-blue-100 text-blue-600 mb-3 md:mb-4">
-                                    {stat.icon}
-                                </div>
-                                <div className="text-2xl md:text-3xl font-bold text-gray-900 mb-1">{stat.number}</div>
-                                <div className="text-sm md:text-base text-gray-600">{stat.label}</div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            </section>
-
             {/* Features Section */}
             <section className="py-12 md:py-16 bg-white">
                 <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="text-center mb-10 md:mb-14">
                         <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-3 md:mb-4">
-                            Why Choose SajiloSafar?
+                            Why Choose SewaYatra?
                         </h2>
                         <p className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto">
                             Experience the best bus travel in Nepal with our premium services
@@ -109,8 +92,8 @@ const Home = () => {
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
                         {features.map((feature, index) => (
-                            <div key={index} className="group p-6 bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 border border-gray-100 hover:border-blue-200">
-                                <div className="inline-flex items-center justify-center w-12 h-12 rounded-lg bg-blue-50 text-blue-600 mb-4 group-hover:scale-110 transition-transform">
+                            <div key={index} className="group p-6 bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 border border-gray-100 hover:border-emerald-200">
+                                <div className="inline-flex items-center justify-center w-12 h-12 rounded-lg bg-emerald-50 text-emerald-600 mb-4 group-hover:scale-110 transition-transform">
                                     {feature.icon}
                                 </div>
                                 <h3 className="text-lg font-semibold text-gray-900 mb-2">{feature.title}</h3>
@@ -144,7 +127,7 @@ const Home = () => {
                                         setFrom(fromCity);
                                         setTo(toCity);
                                     }}
-                                    className="group bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100 hover:border-blue-200"
+                                    className="group bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100 hover:border-emerald-200"
                                 >
                                     <div className="h-32 sm:h-40 relative overflow-hidden">
                                         <div
@@ -166,7 +149,7 @@ const Home = () => {
 
                                         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10">
                                             <div className="w-8 h-8 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg">
-                                                <Navigation className="w-4 h-4 text-blue-600 transform rotate-90" />
+                                                <Navigation className="w-4 h-4 text-emerald-600 transform rotate-90" />
                                             </div>
                                         </div>
                                     </div>
@@ -178,7 +161,7 @@ const Home = () => {
                                                 <div className="text-xs text-gray-500 my-1">to</div>
                                                 <h3 className="font-semibold text-gray-900">{toCity}</h3>
                                             </div>
-                                            <div className="flex items-center text-blue-600 font-medium text-sm">
+                                            <div className="flex items-center text-emerald-600 font-medium text-sm">
                                                 Book Now <ArrowRight className="w-4 h-4 ml-1" />
                                             </div>
                                         </div>
@@ -204,8 +187,8 @@ const Home = () => {
 
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4 md:gap-6">
                         {busAmenities.map((amenity, index) => (
-                            <div key={index} className="flex flex-col items-center p-4 bg-gray-50 rounded-lg hover:bg-blue-50 transition-colors">
-                                <div className="w-10 h-10 flex items-center justify-center rounded-full bg-white text-blue-600 mb-3">
+                            <div key={index} className="flex flex-col items-center p-4 bg-gray-50 rounded-lg hover:bg-emerald-50 transition-colors">
+                                <div className="w-10 h-10 flex items-center justify-center rounded-full bg-white text-emerald-600 mb-3">
                                     {amenity.icon}
                                 </div>
                                 <span className="text-sm font-medium text-gray-700 text-center">{amenity.label}</span>
@@ -223,7 +206,7 @@ const Home = () => {
                             What Our Travelers Say
                         </h2>
                         <p className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto">
-                            Join thousands of satisfied customers who trust SajiloSafar
+                            Join thousands of satisfied customers who trust SewaYatra
                         </p>
                     </div>
 
@@ -237,7 +220,7 @@ const Home = () => {
                                 </div>
                                 <p className="text-gray-600 mb-6 italic">"{testimonial.content}"</p>
                                 <div className="flex items-center">
-                                    <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-semibold mr-3">
+                                    <div className="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600 font-semibold mr-3">
                                         {testimonial.name.charAt(0)}
                                     </div>
                                     <div>
@@ -252,20 +235,20 @@ const Home = () => {
             </section>
 
             {/* CTA Section */}
-            <section className="bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-800 py-12 md:py-16" id="cta">
+            <section className="bg-gradient-to-r from-emerald-600 via-green-600 to-teal-700 py-12 md:py-16" id="cta">
                 <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="max-w-3xl mx-auto text-center px-4">
                         <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-4 md:mb-6">
                             Ready for Your Next Adventure?
                         </h2>
-                        <p className="text-blue-100 text-base sm:text-lg md:text-lg mb-6 md:mb-8 leading-relaxed">
+                        <p className="text-emerald-100 text-base sm:text-lg md:text-lg mb-6 md:mb-8 leading-relaxed">
                             Experience the beauty of Nepal with comfortable, reliable bus journeys.
                             Book your tickets in seconds and travel with confidence.
                         </p>
                         <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
                             <button
                                 onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-                                className="bg-white text-blue-700 font-semibold py-3 px-6 md:py-3.5 md:px-8 rounded-lg hover:bg-gray-50 transition-colors shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 duration-200 text-sm sm:text-base"
+                                className="bg-white text-emerald-700 font-semibold py-3 px-6 md:py-3.5 md:px-8 rounded-lg hover:bg-gray-50 transition-colors shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 duration-200 text-sm sm:text-base"
                             >
                                 Book Your Ticket Now
                             </button>
